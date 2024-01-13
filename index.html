@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Art</title>
+</head>
+<body>
+    <input type="file" id="upload-btn" style="width: 0" /> <!--width 0 hides the no file selected thingy-->
+    <div class="container centered-div">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <style>
+        body {
+            background-color: #1c1c1c;
+            font-family: 'Courier New', monospace;
+        }
+
+        .container {
+            position: absolute;
+            display: inline-block;
+        }
+
+        .centered-div{
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -40%);
+        }
+
+
+        input[type="file"]::-webkit-file-upload-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 10%);
+            background-color: #151616;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: medium;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 50px;
+        }
+        
+    </style>
+
+    <script>
+        // function to convert file to hex
+        const fileToHex = (file) => new Promise((resolve, reject) => {
+            const chunkSize = 1024 * 1024; // Read 1 MB at a time
+            const hexParts = [];
+
+            const readChunk = (offset) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const arrayBuffer = reader.result;
+                    const byteArray = new Uint8Array(arrayBuffer);
+                    byteArray.forEach((byte) => {
+                        const hex = byte.toString(16);
+                        const paddedHex = ('00' + hex).slice(-2);
+                        hexParts.push(paddedHex);
+                    });
+
+                    if (offset + chunkSize < file.size) {
+                        readChunk(offset + chunkSize);
+                    } else {
+                        resolve(hexParts.join(''));
+                    }
+                };
+                reader.onerror = reject;
+                const chunk = file.slice(offset, offset + chunkSize);
+                reader.readAsArrayBuffer(chunk);
+            };
+
+            readChunk(0);
+        });
+
+
+        // handle file upload
+        const uploadBtn = document.getElementById('upload-btn');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        uploadBtn.addEventListener('change', handleUpload, false);
+
+    function handleUpload(e) {
+        const file = e.target.files[0];
+
+        // convert file to hex
+        fileToHex(file).then((hexData) => {
+            // split hex string into 6 characters and convert to rgb
+            const colors = hexData.match(/.{1,6}/g).map((hexPair) => {
+                return {
+                    r: parseInt(hexPair.substring(0, 2), 16),
+                    g: parseInt(hexPair.substring(2, 4), 16),
+                    b: parseInt(hexPair.substring(4, 6), 16),
+                };
+            });
+
+            // determine canvas size based on file size
+            const rowCount = Math.ceil(Math.sqrt(colors.length));
+            const cellSize = 1; // size of each cell in pixels
+            let canvasWidth = cellSize * rowCount;
+            let canvasHeight = cellSize * rowCount;
+
+            // make sure canvas can fit all the data
+            while (colors.length > canvasWidth * canvasHeight) {
+                // expand canvas if needed
+                canvasWidth++;
+                canvasHeight++;
+            }
+
+            // create canvas and context
+            const canvas = document.getElementById("canvas");
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            const ctx = canvas.getContext("2d");
+
+            // draw colors on canvas
+            let x = 0;
+            let y = 0;
+            colors.forEach((color) => {
+                ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+                ctx.fillRect(x, y, cellSize, cellSize);
+
+                x += cellSize;
+                if (x >= canvas.width) {
+                    x = 0;
+                    y += cellSize;
+                }
+            });
+        });
+    }
+    </script>
+    
+</body>
+</html>
