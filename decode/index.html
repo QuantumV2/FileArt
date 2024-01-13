@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="FileArt">
+    <meta property="og:description" content="Displays files as an image!">
+    <title>File Art</title>
+</head>
+
+<body>
+    <input type="file" id="upload-btn" style="width: 0" /> <!--width 0 hides the no file selected thingy-->
+    <div class="container centered-div">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <style>
+        body {
+            background-color: #1c1c1c;
+            font-family: 'Courier New', monospace;
+        }
+
+
+        .centered-div {
+            z-index: 1;
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, -5%);
+        }
+
+
+        input[type="file"]::-webkit-file-upload-button {
+            z-index: 2;
+            position: absolute;
+            bottom: 15vh;
+            left: 50vw;
+            transform: translate(-50%, -15vh);
+            background-color: #151616;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: medium;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 50px;
+        }
+    </style>
+
+    <script>
+
+    // function to convert hex to file
+    const hexToFile = async (hexData, fileName) => {
+        const byteArray = [];
+        for (let i = 0; i < hexData.length; i += 2) {
+            const byte = parseInt(hexData.substring(i, i + 2), 16);
+            byteArray.push(byte);
+        }
+        const blob = new Blob([new Uint8Array(byteArray)], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    // handle file upload and download
+    const fileInput = document.getElementById('upload-btn');
+    const downloadBtn = document.getElementById('download-btn');
+
+    fileInput.addEventListener('change', (e) => {
+        let fileStr = "";
+        if (!window.FileReader) return; // Browser is not compatible
+
+        var reader = new FileReader();
+
+        reader.onload = function (evt) {
+            if (evt.target.readyState != 2) return;
+            if (evt.target.error) {
+                alert('Error while reading file');
+                return;
+            }
+
+            fileStr = evt.target.result;
+            hexToFile(fileStr, "fileData")
+        };
+
+        reader.readAsText(e.target.files[0]);
+
+
+    });
+    </script>
+
+</body>
+
+</html>
