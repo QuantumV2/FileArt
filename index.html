@@ -9,6 +9,7 @@
 </head>
 <body>
     <input type="file" id="upload-btn" style="width: 0" /> <!--width 0 hides the no file selected thingy-->
+    <button onclick="download()">Download Image</button>
     <div class="container centered-div">
         <canvas id="canvas"></canvas>
     </div>
@@ -47,10 +48,29 @@
             cursor: pointer;
             border-radius: 50px;
         }
+        button {
+            z-index: 3;
+            position: absolute;
+            bottom: 10vh;
+            left: 50vw;
+            transform: translate(-50%, -10vh);
+            background-color: #151616;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: medium;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 50px;
+        }
         
     </style>
 
     <script>
+
         // function to convert file to hex
         const fileToHex = (file) => new Promise((resolve, reject) => {
             const chunkSize = 1024 * 1024; // Read 1 MB at a time
@@ -86,6 +106,13 @@
         const uploadBtn = document.getElementById('upload-btn');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+
+        function download() {
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png");
+            link.download = "FileArtImage_" +  Math.round(Math.random() * 100000) + ".png";
+            link.click();
+        }
 
         uploadBtn.addEventListener('change', handleUpload, false);
 
