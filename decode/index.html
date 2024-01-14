@@ -9,7 +9,6 @@
 </head>
 <body>
     <input type="file" id="upload-btn" style="width: 0" /> <!--width 0 hides the no file selected thingy-->
-    <button onclick="download()">Download Image</button>
 
     <style>
         body {
@@ -30,27 +29,9 @@
         input[type="file"]::-webkit-file-upload-button {
             z-index: 2;
             position: absolute;
-            bottom: 15vh;
+            bottom: 50%;
             left: 50vw;
-            transform: translate(-50%, -15vh);
-            background-color: #151616;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: medium;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 50px;
-        }
-        button {
-            z-index: 3;
-            position: absolute;
-            bottom: 10vh;
-            left: 50vw;
-            transform: translate(-50%, -10vh);
+            transform: translate(-50%, -50%);
             background-color: #151616;
             border: none;
             color: white;
