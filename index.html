@@ -70,7 +70,8 @@
     </style>
 
     <script>
-
+        const urlParams = new URLSearchParams(window.location.search);
+        let cvWidth = parseInt(urlParams.get('width'));
         // function to convert file to hex
         const fileToHex = (file) => new Promise((resolve, reject) => {
             const chunkSize = 1024 * 1024; // Read 1 MB at a time
@@ -133,13 +134,13 @@
             // determine canvas size based on file size
             const rowCount = Math.ceil(Math.sqrt(colors.length));
             const cellSize = 1; // size of each cell in pixels
-            let canvasWidth = cellSize * rowCount;
+            let canvasWidth = cvWidth || (cellSize * rowCount);
             let canvasHeight = cellSize * rowCount;
 
             // make sure canvas can fit all the data
             while (colors.length > canvasWidth * canvasHeight) {
                 // expand canvas if needed
-                canvasWidth++;
+                //canvasWidth++;
                 canvasHeight++;
             }
 
