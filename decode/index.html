@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="FileArt Decoder">
+    <meta property="og:description" content="Displays files.. I mean decodes images">
+    <title>File Art</title>
+</head>
+<body>
+    <input type="file" id="upload-btn" style="width: 0" /> <!--width 0 hides the no file selected thingy-->
+    <button onclick="download()">Download Image</button>
+
+    <style>
+        body {
+            background-color: #1c1c1c;
+            font-family: 'Courier New', monospace;
+        }
+
+
+        .centered-div{
+            z-index: 1;
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translate(-50%, -5%);
+        }
+
+
+        input[type="file"]::-webkit-file-upload-button {
+            z-index: 2;
+            position: absolute;
+            bottom: 15vh;
+            left: 50vw;
+            transform: translate(-50%, -15vh);
+            background-color: #151616;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: medium;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 50px;
+        }
+        button {
+            z-index: 3;
+            position: absolute;
+            bottom: 10vh;
+            left: 50vw;
+            transform: translate(-50%, -10vh);
+            background-color: #151616;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: medium;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 50px;
+        }
+        
+    </style>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById('upload-btn').addEventListener('change', function (event) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                    const buffer = new ArrayBuffer(imageData.data.length);
+                    const uint8View = new Uint8Array(buffer);
+                    for (let i = 0, k = 0; i < imageData.data.length; i += 4, k += 3) {
+                        uint8View[k] = imageData.data[i];     // red
+                        uint8View[k + 1] = imageData.data[i + 1]; // green
+                        uint8View[k + 2] = imageData.data[i + 2]; // blue
+                    }
+                    downloadToFile(new Blob([buffer], { type: 'application/octet-stream' }), 'output.bin', 'application/octet-stream');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        });
+    });
+
+    function downloadToFile(content, filename, contentType) {
+        const a = document.createElement('a');
+        const file = new Blob([content], { type: contentType });
+
+        a.href = URL.createObjectURL(file);
+        a.download = filename;
+        a.click();
+
+        URL.revokeObjectURL(a.href);
+    }
+
+    // Helper function to convert RGB values to hex
+    function rgbToHex(r, g, b) {
+        let red = r.toString(16).padStart(2, '0');
+        let green = g.toString(16).padStart(2, '0');
+        let blue = b.toString(16).padStart(2, '0');
+        return red + green + blue;
+    }
+    // Helper function to convert hex string to normal text
+    function hexToText(hexString) {
+        let str = '';
+        for (let i = 0; i < hexString.length; i += 2) {
+            const hexValue = hexString.substr(i, 2);
+            const decimalValue = parseInt(hexValue, 16);
+            str += String.fromCharCode(decimalValue);
+        }
+        return str;
+    }
+
+    // Helper function to trigger browser download
+    /*function downloadToFile(content, filename, contentType) {
+        const a = document.createElement('a');
+        const file = new Blob([content], { type: contentType });
+
+        a.href = URL.createObjectURL(file);
+        a.download = filename;
+        a.click();
+
+        URL.revokeObjectURL(a.href);
+    }*/
+    </script>
+    
+</body>
+</html>
