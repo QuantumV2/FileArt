@@ -69,7 +69,7 @@
                     const buffer = new ArrayBuffer(transparentPixelCount * 3);
                     const uint8View = new Uint8Array(buffer);
                     let k = 0;
-                    for (let i = 0; i < imageData.data.length; i += 4) {
+                    for (let i = split; i < imageData.data.length; i += push) {
                         if (imageData.data[i + 3] == 255) {
                             if (k + 3 <= uint8View.length) {
                                 uint8View[k] = imageData.data[i];
