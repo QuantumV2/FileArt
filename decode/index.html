@@ -63,9 +63,14 @@
                     const buffer = new ArrayBuffer(imageData.data.length);
                     const uint8View = new Uint8Array(buffer);
                     for (let i = 0, k = 0; i < imageData.data.length; i += 4, k += 3) {
-                        uint8View[k] = imageData.data[i];     // red
-                        uint8View[k + 1] = imageData.data[i + 1]; // green
-                        uint8View[k + 2] = imageData.data[i + 2]; // blue
+                        if(imageData.data[i + 3] != 255)
+                        {
+                            uint8View[k] = imageData.data[i];     // red
+                            uint8View[k + 1] = imageData.data[i + 1]; // green
+                            uint8View[k + 2] = imageData.data[i + 2]; // blue
+                        } else {
+                            break;
+                        }
                     }
                     downloadToFile(new Blob([buffer], { type: 'application/octet-stream' }), 'output.bin', 'application/octet-stream');
                 };
