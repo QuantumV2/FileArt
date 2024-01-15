@@ -60,16 +60,25 @@
                     canvas.height = img.height;
                     ctx.drawImage(img, 0, 0);
                     const imageData = ctx.getImageData(0, 0, img.width, img.height);
-                    const buffer = new ArrayBuffer(imageData.data.length);
+                    let transparentPixelCount = 0;
+                    for (let i = 0; i < imageData.data.length; i += 4) {
+                        if (imageData.data[i + 3] == 255) {
+                            transparentPixelCount++;
+                        }
+                    }
+                    const buffer = new ArrayBuffer(transparentPixelCount * 3);
                     const uint8View = new Uint8Array(buffer);
-                    for (let i = 0, k = 0; i < imageData.data.length; i += 4, k += 3) {
-                        if(imageData.data[i + 3] == 255)
-                        {
-                            uint8View[k] = imageData.data[i];     // red
-                            uint8View[k + 1] = imageData.data[i + 1]; // green
-                            uint8View[k + 2] = imageData.data[i + 2]; // blue
-                        } else {
-                            break;
+                    let k = 0;
+                    for (let i = 0; i < imageData.data.length; i += 4) {
+                        if (imageData.data[i + 3] == 255) {
+                            if (k + 3 <= uint8View.length) {
+                                uint8View[k] = imageData.data[i];
+                                uint8View[k + 1] = imageData.data[i + 1];
+                                uint8View[k + 2] = imageData.data[i + 2];
+                                k += 3;
+                            } else {
+                                console.log("Skipping pixel due to buffer overflow");
+                            }
                         }
                     }
                     downloadToFile(new Blob([buffer], { type: 'application/octet-stream' }), 'output.bin', 'application/octet-stream');
