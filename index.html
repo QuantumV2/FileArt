@@ -73,6 +73,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         let cvWidth = parseInt(urlParams.get('width'));
         let skip = parseInt(urlParams.get('skip')) || 0;
+        let pushLimit = parseInt(urlParams.get('push')) || skip + 1;
         // function to convert file to hex
         const fileToHex = (file) => new Promise((resolve, reject) => {
             const chunkSize = 1024 * 1024; // Read 1 MB at a time
@@ -85,7 +86,7 @@
                     const byteArray = new Uint8Array(arrayBuffer);
 
                 
-                    for (let i = skip; i < byteArray.length; i += skip + 1) {
+                    for (let i = skip; i < byteArray.length; i += pushLimit) {
                         const hex = byteArray[i].toString(16);
                         const paddedHex = ('00' + hex).slice(-2);
                         hexParts.push(paddedHex);
