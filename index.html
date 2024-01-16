@@ -76,6 +76,7 @@
         let cvWidth = parseInt(urlParams.get('width'));
         let skip = parseInt(urlParams.get('skip')) || 0;
         let pushLimit = parseInt(urlParams.get('push')) || skip + 1;
+        let reverse = urlParams.get('reverse') == "true" || "false";
         // function to convert file to hex
         const fileToHex = (file) => new Promise((resolve, reject) => {
             const chunkSize = 1024 * 1024; // Read 1 MB at a time
@@ -97,6 +98,7 @@
                     if (offset + chunkSize < file.size) {
                         readChunk(offset + chunkSize);
                     } else {
+                        if (reverse) hexParts.reverse();
                         resolve(hexParts.join(''));
                     }
                 };
