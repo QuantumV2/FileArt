@@ -7,13 +7,15 @@
     <meta property="og:image" content="https://quantumv2.github.io/FileArt/favicon.png" />
     <meta property="og:title" content="FileArt">
     <meta property="og:description" content="Displays files as an image!">
+    <script src="wrapped-canvas.js"></script>
+    <script src="jszip.min.js"></script>
     <title>File Art</title>
 </head>
 <body>
     <input type="file" id="upload-btn" style="width: 0" /> <!--width 0 hides the no file selected thingy-->
     <button onclick="download()">Download Image</button>
-    <div class="container centered-div">
-        <canvas id="canvas"></canvas>
+    <div class="container centered-div" id="canvcontainer">
+        <!--<canvas id="canvas"></canvas>     why have a single canvas when you can have infinite-->
     </div>
 
     <style>
@@ -126,19 +128,52 @@
 
         // handle file upload
         const uploadBtn = document.getElementById('upload-btn');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d', {alpha: false});
+        const canvases = document.getElementById('canvcontainer');
 
         function download() {
-            const link = document.createElement("a");
-            link.href = canvas.toDataURL("image/png");
-            link.download = "FileArtImage_" +  Math.round(Math.random() * 100000) + ".png";
-            link.click();
+            if(canvases.children.length > 1)
+            {
+                let links = []
+                for (const child of canvases.children) {
+                    links.push(child.toDataURL("image/png"));
+                }
+                downloadFilesAsZip(links, "FileArtZip_" + Math.round(Math.random() * 100000), ".png")
+            }
+            else
+            {
+                
+                const link = document.createElement("a");
+                link.href = canvases.children[0].toDataURL("image/png");
+                link.download = "FileArtImage_" + Math.round(Math.random() * 100000) + ".png";
+                link.click();
+            }
         }
 
         uploadBtn.addEventListener('change', handleUpload, false);
 
+
+    async function downloadFilesAsZip(urls, zipName, ext) {
+        const zip = new JSZip();
+        const folder = zip.folder(zipName);
+
+        for (let url of urls) {
+            const response = await fetch(url);
+            const data = await response.blob();
+            const filename = url.split('/').pop() + ext;
+            folder.file(filename, data);
+        }
+
+        const content = await zip.generateAsync({ type: 'blob' });
+        const blob = new Blob([content], { type: 'application/zip' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = zipName + '.zip';
+        a.click();
+    }
+
     function handleUpload(e) {
+        document.getElementById("canvcontainer").replaceChildren();
         const file = e.target.files[0];
 
         // convert file to hex
@@ -166,9 +201,7 @@
 
 
             // create canvas and context
-            const canvas = document.getElementById("canvas");
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
+            const canvas = new BrowserIndependentCanvas(canvasWidth, canvasHeight);
             const ctx = canvas.getContext("2d");
 
 
@@ -185,6 +218,13 @@
                     y += cellSize;
                 }
             });
+
+            canvas.canvasElems.forEach((_canvas) => {
+
+                document.getElementById("canvcontainer").append(_canvas);
+
+            });
+
 
         });
     }
