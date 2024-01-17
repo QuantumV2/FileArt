@@ -127,7 +127,7 @@
         // handle file upload
         const uploadBtn = document.getElementById('upload-btn');
         const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', {alpha: false});
 
         function download() {
             const link = document.createElement("a");
@@ -150,8 +150,7 @@
                     g: parseInt(hexPair.substring(2, 4), 16),
                     b: parseInt(hexPair.substring(4, 6), 16),
                 };
-            });
-
+            }); 
             // determine canvas size based on file size
             const rowCount = Math.ceil(Math.sqrt(colors.length));
             const cellSize = 1; // size of each cell in pixels
@@ -165,11 +164,13 @@
                 canvasHeight++;
             }
 
+
             // create canvas and context
             const canvas = document.getElementById("canvas");
             canvas.width = canvasWidth;
             canvas.height = canvasHeight;
             const ctx = canvas.getContext("2d");
+
 
             // draw colors on canvas
             let x = 0;
@@ -184,6 +185,7 @@
                     y += cellSize;
                 }
             });
+
         });
     }
     </script>
