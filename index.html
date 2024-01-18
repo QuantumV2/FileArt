@@ -77,7 +77,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         let cvWidth = parseInt(urlParams.get('width'));
         let skip = parseInt(urlParams.get('skip')) || 0;
-        let pushLimit = parseInt(urlParams.get('push')) || skip + 1;
+        let pushLimit = parseInt(urlParams.get('push')) || (urlParams.get('skip') != undefined ? skip + 1 : 4);
         let reverse = urlParams.get('reverse') === "true" || false;
         let multiply = parseFloat(urlParams.get('multiply')) || 1;
         // function to convert file to hex
