@@ -13,7 +13,7 @@
 </head>
 <body>
     <input type="file" id="upload-btn" style="width: 0" /> <!--width 0 hides the no file selected thingy-->
-    <button onclick="download()">Download Image(s)</button>
+    <button id="download" onclick="download()" style="display: none;">Download Image(s)</button>
     <div class="container centered-div" id="canvcontainer">
         <!--<canvas id="canvas"></canvas>     why have a single canvas when you can have infinite-->
     </div>
@@ -224,6 +224,8 @@
                 document.getElementById("canvcontainer").append(_canvas);
 
             });
+
+            document.getElementById("download").style.display = 'block'; 
 
 
         });
