@@ -12,7 +12,8 @@
     <title>File Art</title>
 </head>
 <body>
-    <input type="file" id="upload-btn" style="width: 0" /> <!--width 0 hides the no file selected thingy-->
+    <input type="file" id="upload-btn" style="display: none;" />
+    <button id="upload-btn-styled" class="upld-btn">Upload File</button>
     <button id="download" onclick="download()" style="display: none;">Download Image(s)</button>
     <div class="container centered-div" id="canvcontainer">
         <!--<canvas id="canvas"></canvas>     why have a single canvas when you can have infinite-->
@@ -34,7 +35,7 @@
         }
 
 
-        input[type="file"]::-webkit-file-upload-button {
+        .upld-btn {
             z-index: 2;
             position: absolute;
             bottom: 15vh;
@@ -123,6 +124,10 @@
             };
 
             readChunk(0);
+        });
+
+        document.getElementById('upload-btn-styled').addEventListener('click', function () {
+            document.getElementById('upload-btn').click();
         });
 
 
